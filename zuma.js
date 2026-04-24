@@ -79,7 +79,8 @@ function loadConfig() {
         REQUEST_TIMEOUT:     '30000',
         API_KEY:             'ZUMAOPENCLAWCLIENT',
         TOKEN:               '',
-        DOWNLOAD_LINKS_PAGE: ['https://docs.qq.com/doc/p/1578acc2fb00d12246bcad39e29367e5f3fa5dd9?nlc=1', 'https://zumaai.top/download-links'],
+        DOWNLOAD_LINKS_PAGE: ['https://docs.qq.com/doc/p/1578acc2fb00d12246bcad39e29367e5f3fa5dd9', 'https://zumaai.top/download-links'],
+        DOWNLOAD_LINKS: ['https://gitee.com/biglobin/zuma_desktop_executor/releases/download/latest/ZUMAROBOT_RELEASE_STANDARD.zip', 'https://github.com/biglobin/zuma_desktop_executor/releases/download/latest/ZUMAROBOT_RELEASE_STANDARD.zip'],
         IMGBB_API_KEY:       '669ae31e56af5f66402d9ff239f1980d',
     };
     const envPath = join(__dir, '..', '.env');
@@ -95,6 +96,7 @@ function loadConfig() {
         apiKey:            process.env.API_KEY              || defaults.API_KEY,
         token:             process.env.TOKEN              || defaults.TOKEN,
         downloadLinksPage: process.env.DOWNLOAD_LINKS_PAGE  || defaults.DOWNLOAD_LINKS_PAGE,
+        downloadLinks: process.env.DOWNLOAD_LINKS  || defaults.DOWNLOAD_LINKS,
         imgbbApiKey:       process.env.IMGBB_API_KEY       || defaults.IMGBB_API_KEY,
     };
 }
@@ -435,20 +437,7 @@ const commands = {
 
     async download() {
         try {
-            // 支持 downloadLinksPage 为数组格式，遍历所有页面获取下载链接
-            const pageUrls = Array.isArray(CFG.downloadLinksPage) 
-                ? CFG.downloadLinksPage 
-                : [CFG.downloadLinksPage];
-            
-            let allUrls = [];
-            for (const pageUrl of pageUrls) {
-                try {
-                    const urls = await fetchDownloadLinks(pageUrl);
-                    allUrls = allUrls.concat(urls);
-                } catch (e) {
-                    console.warn(`获取页面 ${pageUrl} 的下载链接失败：${e.message}`);
-                }
-            }
+            const allUrls = CFG.downloadLinks;
             
             if (allUrls.length === 0) {
                 throw new Error('所有下载链接页面均未找到任何 .zip 下载链接');
